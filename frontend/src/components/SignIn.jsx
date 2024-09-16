@@ -7,7 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useDispatch } from 'react-redux';
-import { addUser } from '../redux/userSlice';
+import { addUser, currentUser, getUserByEmail } from '../redux/userSlice';
 
 
 export default function SignIn() {
@@ -30,7 +30,11 @@ export default function SignIn() {
       email,
       password
     }
-    dispatch(addUser(user))
+    dispatch(getUserByEmail(user.email))
+   if(currentUser.password!=user.password) 
+    alert('you enter wrong password, Try agian')
+   if(currentUser.password==user.password) 
+    alert('Welcome!')
     setOpen(false);
   };
   return (

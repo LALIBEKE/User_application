@@ -15,7 +15,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import TextField from '@mui/material/TextField';
 import DialogContent from '@mui/material/DialogContent';
-import { currentUser, deleteUser, updateUser } from '../redux/userSlice';
+import { currentUser, deleteUser, signOut, updateUser } from '../redux/userSlice';
 import { useDispatch } from 'react-redux';
 
 export default function UserActions() {
@@ -29,37 +29,45 @@ export default function UserActions() {
 
   const handleClose = () => {
     setAnchorEl(null);
-    setOpenProfile(!openProfile)
   };
   const [openProfile, setOpenProfile] = React.useState(false);
 
-
-  const handleCloseProfile = () => {
-    setOpenProfile(false);
+  const handleClickProfile = () => {
+    setOpenProfile(!openProfile);
   };
 
   const handleDeleteUser = () => {
-    dispatch(deleteUser(currentUser.id))
+    dispatch(deleteUser(currentUser.email))
   };
 
   const handleEditUser = () => {
-    handleCloseProfile()
-    setOpenedit(!openedit)//not working!!!
+    setOpenedit(!openedit)
+    handleClickProfile()
     const user = {
       name,
       email,
       phone,
       password
     }
-    dispatch(updateUser(currentUser.id))
-    setOpenedit(false);
-
+    dispatch(updateUser(user))
+    handleClose()
   };
+
+  const handleCloseEditUser = () => {
+    setOpenedit(!openedit)
+    setOpenProfile(!openProfile);
+  }
+
   const [openedit, setOpenedit] = React.useState(false);
   const [email, setEmail] = React.useState(currentUser.email)
   const [name, setName] = React.useState(currentUser.name)
   const [phone, setPhone] = React.useState(currentUser.phone)
   const [password, setPassword] = React.useState(currentUser.password)
+  const handleSignOut = () => {
+    alert('You Sign Out!')
+    dispatch(signOut)
+    handleClose()
+  }
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -94,15 +102,15 @@ export default function UserActions() {
               open={Boolean(anchorEl)}
               onClose={handleClose}
             >
-              <MenuItem onClick={handleClose}>Profile</MenuItem>
-              <MenuItem onClick={handleClose}>Sign Out</MenuItem>
+              <MenuItem onClick={handleClickProfile}>Profile</MenuItem>
+              <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
             </Menu>
           </div>
         </Toolbar>
       </AppBar>
       <Dialog
         open={openProfile}
-        onClose={handleCloseProfile}
+        onClose={handleClickProfile}
         PaperProps={{
           component: 'form',
           onSubmit: (event) => {
@@ -111,7 +119,7 @@ export default function UserActions() {
             const formJson = Object.fromEntries(formData.entries());
             const name = formJson.name;
             console.log(name);
-            handleCloseProfile();
+            handleClickProfile();
           },
         }}
       >
@@ -120,11 +128,11 @@ export default function UserActions() {
         <span>email={currentUser.email}</span>
         <span>phone={currentUser.phone}</span>
         <DialogActions>
-          <Button onClick={handleCloseProfile}>close</Button>
+          <Button onClick={handleClickProfile}>close</Button>
           <IconButton onClick={handleDeleteUser} aria-label="delete" color="primary">
             <DeleteIcon />
           </IconButton>
-          <IconButton  onClick={handleEditUser} aria-label="edit" color="primary">
+          <IconButton onClick={handleCloseEditUser} aria-label="edit" color="primary">
             <EditIcon />
           </IconButton>
         </DialogActions>
@@ -156,6 +164,7 @@ export default function UserActions() {
             type="string"
             fullWidth
             variant="standard"
+            defaultValue={currentUser.name}
             onChange={(e) => setName(e.target.value)}
           />
           <TextField
@@ -168,6 +177,7 @@ export default function UserActions() {
             type="email"
             fullWidth
             variant="standard"
+            defaultValue={currentUser.email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <TextField
@@ -180,6 +190,7 @@ export default function UserActions() {
             type="string"
             fullWidth
             variant="standard"
+            defaultValue={currentUser.phone}
             onChange={(e) => setPhone(e.target.value)}
           />
           <TextField
@@ -192,11 +203,12 @@ export default function UserActions() {
             type="password"
             fullWidth
             variant="standard"
+            defaultValue={currentUser.password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleCloseEditUser}>Cancel</Button>
           <Button onClick={handleEditUser} type="submit">Subscribe</Button>
         </DialogActions>
       </Dialog>

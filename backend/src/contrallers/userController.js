@@ -10,10 +10,10 @@ const getUsers = async (req, res) => {
   }
 };
 
-const getUserById = async (req, res) => {
-  const { id } = req.params;
+const getUserByEmail = async (req, res) => {
+  const { email } = req.params;
   try {
-    const user = await User.findById(id);
+    const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -24,9 +24,7 @@ const getUserById = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  console.log(req.body);
   const newUser = new User(req.body);
-
   try {
     const user = await User.create(newUser);
     res.status(201).json(user);
@@ -35,6 +33,15 @@ const createUser = async (req, res) => {
   }
 };
 
+// const updateUser = async (req, res) => {
+//   const { email } = req.params;
+//   try {
+//     const updatedUser = await User.findOneAndUpdate(email, req.body, { new: true });
+//     res.json(updatedUser);
+//   } catch (error) {
+//     res.status(400).json({ message: error.message });
+//   }
+// };
 const updateUser = async (req, res) => {
   const { id } = req.params;
   try {
@@ -46,9 +53,9 @@ const updateUser = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  const { id } = req.params;
+  const { email } = req.params;
   try {
-    await User.findByIdAndDelete(id);
+    await User.findOneAndDelete(email);
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -57,7 +64,7 @@ const deleteUser = async (req, res) => {
 
 module.exports = {
   getUsers,
-  getUserById,
+  getUserByEmail,
   createUser,
   updateUser,
   deleteUser
