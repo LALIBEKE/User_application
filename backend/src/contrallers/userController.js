@@ -1,3 +1,5 @@
+const User = require("../models/User");
+
 // Controller (controllers/userController.js)
 const getUsers = async (req, res) => {
   try {
@@ -8,11 +10,26 @@ const getUsers = async (req, res) => {
   }
 };
 
-const createUser = async (req, res) => {
-  const newUser = new User(req.body);
+const getUserById = async (req, res) => {
+  const { id } = req.params;
   try {
-    await newUser.save();
-    res.status(201).json(newUser);
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const createUser = async (req, res) => {
+  console.log(req.body);
+  const newUser = new User(req.body);
+
+  try {
+    const user = await User.create(newUser);
+    res.status(201).json(user);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -40,6 +57,7 @@ const deleteUser = async (req, res) => {
 
 module.exports = {
   getUsers,
+  getUserById,
   createUser,
   updateUser,
   deleteUser
