@@ -11,19 +11,25 @@
 # התקנות:
 Frontend:
 1.git clone <repository-url>
+
 2.cd frontend
+
 3.npm install
+
 4.npm start
 
 Backend:
 1.cd Backend
+
 2.npm install
+
 3 . env:
+
 CONNECTION_URL=mongodb://127.0.0.1:27017/UserManagementApplication
 PORT=8000
 
-![image](https://github.com/user-attachments/assets/d7e18507-8569-4645-9281-779f22a2a613)
 
+![image](https://github.com/user-attachments/assets/33075d82-ec10-46e5-91f8-0c73a000e72b)
 
 
 
