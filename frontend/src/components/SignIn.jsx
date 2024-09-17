@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -9,13 +10,12 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useDispatch } from 'react-redux';
 import { addUser, currentUser, getUserByEmail } from '../redux/userSlice';
 
-
 export default function SignIn() {
   const dispatch = useDispatch();
 
   const [open, setOpen] = React.useState(false);
-  const [email, setEmail] = React.useState('')
-  const [password, setPassword] = React.useState('')
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -28,18 +28,25 @@ export default function SignIn() {
   const handleSaveClose = () => {
     const user = {
       email,
-      password
+      password,
+    };
+    dispatch(getUserByEmail(user.email));
+    if (currentUser.password !== user.password) {
+      alert('You entered the wrong password, please try again');
     }
-    dispatch(getUserByEmail(user.email))
-   if(currentUser.password!=user.password) 
-    alert('you enter wrong password, Try agian')
-   if(currentUser.password==user.password) 
-    alert('Welcome!')
-    setOpen(false);
+    if (currentUser.password === user.password) {
+      alert('Welcome!');
+      setOpen(false);
+    }
   };
+
   return (
     <React.Fragment>
-      <Button variant="outlined" onClick={handleClickOpen}>
+      <Button
+        variant="outlined"
+        onClick={handleClickOpen}
+        sx={{ color: 'white', backgroundColor: 'black', borderColor: 'black' }} // שינוי הצבע לשחור
+      >
         SignIn
       </Button>
       <Dialog
@@ -57,10 +64,10 @@ export default function SignIn() {
           },
         }}
       >
-        <DialogTitle>Sing In</DialogTitle>
+        <DialogTitle>Sign In</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            To signIn to this website, please enter your details here.
+            To sign in to this website, please enter your details here.
           </DialogContentText>
           <TextField
             autoFocus
@@ -72,6 +79,7 @@ export default function SignIn() {
             type="email"
             fullWidth
             variant="standard"
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <TextField
@@ -84,6 +92,7 @@ export default function SignIn() {
             type="password"
             fullWidth
             variant="standard"
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </DialogContent>

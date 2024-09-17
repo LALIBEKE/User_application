@@ -1,6 +1,6 @@
+
 const User = require("../models/User");
 
-// Controller (controllers/userController.js)
 const getUsers = async (req, res) => {
   try {
     const users = await User.find();
@@ -33,34 +33,39 @@ const createUser = async (req, res) => {
   }
 };
 
-// const updateUser = async (req, res) => {
-//   const { email } = req.params;
-//   try {
-//     const updatedUser = await User.findOneAndUpdate(email, req.body, { new: true });
-//     res.json(updatedUser);
-//   } catch (error) {
-//     res.status(400).json({ message: error.message });
-//   }
-// };
 const updateUser = async (req, res) => {
-  const { id } = req.params;
+  const { email } = req.params;
+  const updates = req.body;
+  
   try {
-    const updatedUser = await User.findByIdAndUpdate(id, req.body, { new: true });
+    const updatedUser = await User.findOneAndUpdate({ email: email }, updates, { new: true });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     res.json(updatedUser);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
+
 const deleteUser = async (req, res) => {
-  const { email } = req.params;
+  const email = req.params.email;  
   try {
-    await User.findOneAndDelete(email);
+    const deletedUser = await User.findOneAndDelete({ email });
+    
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
+
 
 module.exports = {
   getUsers,

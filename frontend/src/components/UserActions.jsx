@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -15,13 +16,23 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import TextField from '@mui/material/TextField';
 import DialogContent from '@mui/material/DialogContent';
+import Snackbar from '@mui/material/Snackbar'; 
+import Alert from '@mui/material/Alert'; 
 import { currentUser, deleteUser, signOut, updateUser } from '../redux/userSlice';
 import { useDispatch } from 'react-redux';
 
 export default function UserActions() {
   const dispatch = useDispatch();
-
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [openProfile, setOpenProfile] = React.useState(false);
+  const [openedit, setOpenedit] = React.useState(false);
+  const [email, setEmail] = React.useState(currentUser.email);
+  const [name, setName] = React.useState(currentUser.name);
+  const [phone, setPhone] = React.useState(currentUser.phone);
+  const [password, setPassword] = React.useState(currentUser.password);
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState(''); 
+  const [snackbarSeverity, setSnackbarSeverity] = React.useState('success'); 
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -30,44 +41,60 @@ export default function UserActions() {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const [openProfile, setOpenProfile] = React.useState(false);
 
   const handleClickProfile = () => {
     setOpenProfile(!openProfile);
   };
 
-  const handleDeleteUser = () => {
-    dispatch(deleteUser(currentUser.email))
+  const handleDeleteUser = async () => {
+    try {
+      await dispatch(deleteUser(currentUser.email));
+      setSnackbarMessage('User deleted successfully');
+      setSnackbarSeverity('success');
+    } catch (error) {
+      setSnackbarMessage('Error deleting user');
+      setSnackbarSeverity('error');
+      console.error(error);
+    } finally {
+      setSnackbarOpen(true);
+    }
   };
 
-  const handleEditUser = () => {
-    setOpenedit(!openedit)
-    handleClickProfile()
-    const user = {
-      name,
-      email,
-      phone,
-      password
+  const handleEditUser = async () => {
+    try {
+      const user = {
+        name,
+        email,
+        phone,
+        password,
+      };
+      await dispatch(updateUser(user));
+      setSnackbarMessage('User updated successfully');
+      setSnackbarSeverity('success');
+    } catch (error) {
+      setSnackbarMessage('Error updating user');
+      setSnackbarSeverity('error');
+      console.error(error);
+    } finally {
+      setSnackbarOpen(true);
+      handleClose();
     }
-    dispatch(updateUser(user))
-    handleClose()
   };
 
   const handleCloseEditUser = () => {
-    setOpenedit(!openedit)
-    setOpenProfile(!openProfile);
-  }
+    setOpenedit(false);
+    setOpenProfile(true);
+  };
 
-  const [openedit, setOpenedit] = React.useState(false);
-  const [email, setEmail] = React.useState(currentUser.email)
-  const [name, setName] = React.useState(currentUser.name)
-  const [phone, setPhone] = React.useState(currentUser.phone)
-  const [password, setPassword] = React.useState(currentUser.password)
   const handleSignOut = () => {
-    alert('You Sign Out!')
-    dispatch(signOut)
-    handleClose()
-  }
+    alert('You Signed Out!');
+    dispatch(signOut());
+    handleClose();
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -128,18 +155,18 @@ export default function UserActions() {
         <span>email={currentUser.email}</span>
         <span>phone={currentUser.phone}</span>
         <DialogActions>
-          <Button onClick={handleClickProfile}>close</Button>
+          <Button onClick={handleClickProfile}>Close</Button>
           <IconButton onClick={handleDeleteUser} aria-label="delete" color="primary">
             <DeleteIcon />
           </IconButton>
-          <IconButton onClick={handleCloseEditUser} aria-label="edit" color="primary">
+          <IconButton onClick={() => setOpenedit(true)} aria-label="edit" color="primary">
             <EditIcon />
           </IconButton>
         </DialogActions>
       </Dialog>
       <Dialog
         open={openedit}
-        onClose={handleClose}
+        onClose={() => setOpenedit(false)}
         PaperProps={{
           component: 'form',
           onSubmit: (event) => {
@@ -165,6 +192,7 @@ export default function UserActions() {
             fullWidth
             variant="standard"
             defaultValue={currentUser.name}
+            value={name}
             onChange={(e) => setName(e.target.value)}
           />
           <TextField
@@ -178,6 +206,7 @@ export default function UserActions() {
             fullWidth
             variant="standard"
             defaultValue={currentUser.email}
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <TextField
@@ -191,6 +220,7 @@ export default function UserActions() {
             fullWidth
             variant="standard"
             defaultValue={currentUser.phone}
+            value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
           <TextField
@@ -204,15 +234,36 @@ export default function UserActions() {
             fullWidth
             variant="standard"
             defaultValue={currentUser.password}
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseEditUser}>Cancel</Button>
-          <Button onClick={handleEditUser} type="submit">Subscribe</Button>
+          <Button onClick={() => setOpenedit(false)}>Cancel</Button>
+          <Button onClick={handleEditUser} type="submit">Save</Button>
         </DialogActions>
       </Dialog>
-    </Box >
-
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} 
+        sx={{
+          '& .MuiSnackbarContent-root': {
+            width: '300px', 
+            maxWidth: '80vw', 
+            borderRadius: '8px', 
+            fontSize: '16px', 
+          },
+        }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 }
+
+
+

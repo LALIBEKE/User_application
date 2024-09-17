@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from 'axios';
 export let currentUser = {
-    name: 'Guest',
-    email: 'example@gmail.com',
-    phone: '0555555555',
+    name: '',
+    email: '',
+    phone: '',
     password: ''
 }
 const initialUserState = {
@@ -19,7 +19,7 @@ const userSlice = createSlice({
             try {
                 const response = await axios.get(`http://localhost:8000/user/${userEmail}`);
                 currentUser = response.data;
-                state.users = response.data; // Update the state with the fetched users data
+                state.users = response.data; 
             } catch (error) {
                 console.error(error);
             }
@@ -35,17 +35,17 @@ const userSlice = createSlice({
             try {
                 currentUser = userInstance
                 const response = await axios.post('http://localhost:8000/user', userInstance);
-                state.users.push(response.data); // Update the state with the response data
+                state.users.push(response.data); 
             } catch (error) {
                 console.error(error);
             }
         },
         updateUser: async (state, action) => {
             const updatedUserData = action.payload;
+
             try {
                 currentUser=updatedUserData;
-                const response = await axios.put(`http://localhost:8000/user/${updatedUserData.userEmail}`, updatedUserData);
-                // Update the user data in the state based on the response
+                const response = await axios.put(`http://localhost:8000/user/${updatedUserData.email}`, updatedUserData);
             } catch (error) {
                 console.error(error);
             }
@@ -59,19 +59,20 @@ const userSlice = createSlice({
                 console.error(error);
             }
         },
+        
         fetchUsers: async (state, action) => {
             try {
                 const response = await axios.get('http://localhost:8000/user');
-                state.users = response.data; // Update the state with the fetched users data
+                state.users = response.data; 
             } catch (error) {
                 console.error(error);
             }
         },
         signOut: async (state, action) => {
             currentUser = {
-                name: 'Guest',
-                email: 'example@gmail.com',
-                phone: '0555555555',
+                name: '',
+                email: '',
+                phone: '',
                 password: ''
             }
         },
@@ -81,3 +82,13 @@ const userSlice = createSlice({
 export const { getUserByEmail, addUser, updateUser, deleteUser, fetchUsers, signOut } = userSlice.actions;
 export const selectUsers = (state) => state.users;
 export default userSlice.reducer;
+
+
+
+
+
+
+
+
+
+
