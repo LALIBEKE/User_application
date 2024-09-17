@@ -22,8 +22,8 @@ Backend:
 CONNECTION_URL=mongodb://127.0.0.1:27017/UserManagementApplication
 PORT=8000
 
+![image](https://github.com/user-attachments/assets/d7e18507-8569-4645-9281-779f22a2a613)
 
-![image](https://github.com/user-attachments/assets/a575e6c6-bbe4-4672-a573-03e5a8400024)
 
 
 
